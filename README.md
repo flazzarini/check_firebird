@@ -3,7 +3,7 @@ check_firebird
 
 A nagios plugin to check firebird database connectivity. Following is a sample nagios configuration for this service.
 
-..
+
 
     define command{
             command_name    check_firebird
