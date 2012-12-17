@@ -11,17 +11,17 @@ A nagios plugin to check firebird database connectivity. Following is a sample n
     }
     
     define host {
-            use    generic-host
+            use          generic-host
             host_name    fb21
-            alias    fb21
-            address    10.90.91.21
+            alias        fb21
+            address      127.0.0.1
     }
      
      
     define service {
-            use    generic-service
-            host_name    fb21
+            use                    generic-service
+            host_name              fb21
             service_description    FIREBIRD-test
-            check_command    check_firebird!test!sysdba!masterkey  
+            check_command          check_firebird!test!sysdba!masterkey  
             ;Optional you could put !3051 for a different port
     }
