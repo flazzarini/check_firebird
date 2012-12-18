@@ -3,7 +3,17 @@ check_firebird
 
 A nagios plugin to check firebird database connectivity. Following is a sample nagios configuration for this service.
 
+Requirements
+------------
 
+::
+
+    pip install fdb
+
+
+Example Nagios configuration
+----------------------------
+::
 
     define command{
             command_name    check_firebird
@@ -16,8 +26,7 @@ A nagios plugin to check firebird database connectivity. Following is a sample n
             alias        fb21
             address      127.0.0.1
     }
-     
-     
+
     define service {
             use                    generic-service
             host_name              fb21

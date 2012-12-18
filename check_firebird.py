@@ -2,29 +2,28 @@
 # -*- coding: utf-8 -*-  
 # Firebird Nagios plugin
 #
-# A plugin for Nagios which checks the firebird
-# connection to a specific host by connecting
-# to it and executing an SQL Statement which should
-# return all relations between the tables which
-# are in the database, be aware if you have an
-# empty database without any tables you will get
-# a critical error.
+# A plugin for Nagios which checks the firebird connection to a specific host
+# by connecting to it and executing an SQL Statement which should return all
+# relations between the tables which are in the database, be aware if you have
+# an empty database without any tables you will get a critical error.
 #
 # Based on a template from
 # http://bsd.dischaos.com/2009/04/29/nagios-plugin-template-in-python/
 #
 # Requirements :
-#    python-kinterbasdb
+#    fdb
 #
 # Example :
 #    check_firebird.py -h 192.168.1.1 -a employee -u sysdba -p masterkey -d 3050 
+#
+#
 __author__  = 'Frank Lazzarini'
 __contact__ = 'flazzarini at gmail.com'
-__version__ = '0.3.6'
+__version__ = '0.4.0'
 __license__ = 'GPLv3'
  
 try:
-    import kinterbasdb
+    import fdb
 except ImportError, _:
     pass
  
@@ -59,8 +58,8 @@ def check_condition(host, destport, alias, username, password):
  
     try :
         dsnstring  = host + "/" + destport + ":" + alias
-        connection = kinterbasdb.connect(dsn=dsnstring, user=username, password=password)
-        connection.begin(kinterbasdb.isc_tpb_write + kinterbasdb.isc_tpb_read_committed + kinterbasdb.isc_tpb_rec_version)
+        connection = fdb.connect(dsn=dsnstring, user=username, password=password)
+        connection.begin()
         version = connection.server_version
  
         # Execute an sql on the connection
@@ -72,7 +71,7 @@ def check_condition(host, destport, alias, username, password):
             return {'code': 'CRITICAL', 'message': dsnstring + ' problem with the database, maybe corrupted!'}
         connection.close()
  
-    except kinterbasdb.OperationalError, msg:
+    except fdb.OperationalError, msg:
         return {'code': 'CRITICAL', 'message': dsnstring + ' ' + msg[1].rstrip('\n')}
  
     return {'code': 'OK', 'message': host + ' Version:' + version}
@@ -81,10 +80,10 @@ def check_condition(host, destport, alias, username, password):
 def is_valid_ipv4_address(address):
     # Returns true if IP address is in a valid ipv4 format
     try:
-        addr= socket.inet_pton(socket.AF_INET, address)
+        addr = socket.inet_pton(socket.AF_INET, address)
     except AttributeError: # no inet_pton here, sorry
         try:
-            addr= socket.inet_aton(address)
+            addr = socket.inet_aton(address)
         except socket.error:
             return False
         return address.count('.') == 3
@@ -96,7 +95,7 @@ def is_valid_ipv4_address(address):
 def is_valid_ipv6_address(address):
     # Returns true if IP address is in a valid ipv6 format
     try:
-        addr= socket.inet_pton(socket.AF_INET6, address)
+        addr = socket.inet_pton(socket.AF_INET6, address)
     except socket.error: # not a valid address
         return False
     return True
@@ -112,7 +111,7 @@ def main():
  
     try:
         opts , args = getopt.getopt(sys.argv[1:], 'h:a:u:p:d:', ['host=', 'pass=', 'alias=', 'user=', 'password=', 'destport='])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError:
         usage()
  
     # If destport is not given an argument assume 
